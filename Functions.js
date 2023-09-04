@@ -50,29 +50,6 @@ export const leerArchivo = (ruta) => {
     }
     return links;
 }
-//---------------------------------------------------
-export const mdLinks = (path, options) => {
-    return new Promise((resolve, reject) => {
-      const absolute = ConvertAbsolute(path)
-       //Si no existe la ruta se rechaza la promesa
-       if (!pathExists(absolute)) {
-        reject("La ruta no existe");
-       }  
-     //Identifica si la ruta existe.
-     if (pathExists(absolute)) {
-        if (verificarArchivo(absolute)) {
-          if (validarMd(absolute)){
-            const links = leerArchivo(absolute);
-              console.log(links)
-               resolve(links);
-             //console.log(links)
-          }
-  
-        } 
-      }
-    });
-  };
-  
 
 //_________________________7.- OBTENER CODIGO HTTP Y STATUS (VALIDATE)_________________________________
 //_________________________Declaramos la función validarLinks que toma un parámetro llamado "link"______________________

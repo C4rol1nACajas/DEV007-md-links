@@ -1,4 +1,55 @@
-//import { pathExists, ConvertAbsolute, verificarArchivo, verificarDirectorio, validarMd, leerArchivo, validarLinks, linkStats } from "./Functions.js";
+import { pathExists, ConvertAbsolute, verificarArchivo, verificarDirectorio, validarMd, leerArchivo, validarLinks, linkStats } from "./Functions.js";
+
+export const mdLinks = (path, options) => {
+  return new Promise((resolve, reject) => {
+    const existeRuta = pathExists(path);
+
+    if (existeRuta) {
+      const rutaAbsoluta = ConvertAbsolute(path);
+      const archivos = verificarArchivo(rutaAbsoluta);
+      const archivosMd = validarMd(archivos);
+
+      leerArchivo(archivosMd)
+        .then((data) => {
+          // Realizar operaciones con los enlaces aquí
+         
+          const linksValidados = validarLinks(data, options);  // Por ejemplo, puedes llamar a una función para validar los enlaces
+          const linkStatsResult = linkStats(linksValidados);   //Ejemplo de cálculo de estadísticas de enlaces
+          
+          // Resuelve la promesa con los enlaces validados
+          resolve(linkStatsResult);
+        })
+        .catch((error) => {
+          // Maneja cualquier error que ocurra durante la lectura del archivo
+          reject(error);
+        });
+    } else {
+      // Si la ruta no existe, rechaza la promesa con un mensaje de error
+      reject("La ruta no existe");
+    }
+  });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*export const mdLinks = (path, options) => {
   return new Promise((resolve, reject) => {

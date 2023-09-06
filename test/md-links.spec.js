@@ -130,66 +130,81 @@ describe("verificarDirectorio", () => {
 })
 
 //-----------------------------------------------------------------------------------
-jest.mock('axios'); // Mockear axios para simular las respuestas
+jest.mock('axios');
 
 describe('validarLinks', () => {
-    it('debería retornar estado "ok" para un enlace válido', async () => {
-        const mockResponse = { status: 200 };
-        axios.get.mockResolvedValue(mockResponse);
+  it('debería validar correctamente los enlaces', async () => {
+    // Datos de prueba
+    const links = [
+      { url: 'https://example.com' },
+      { url: 'https://example.org' },
+    ];
 
-        const links = { url: 'https://www.ejemplo.com' };
-        const result = await validarLinks(links);
+    // Configurar respuestas simuladas para axios.get
+    axios.get.mockResolvedValue({ status: 200 }); // Simular un enlace válido
 
-        expect(result.status).toBe(200);
-        expect(result.ok).toBe('ok');
-    });
+    const resultado = await validarLinks(links);
 
-    it('debería retornar estado "fail" para un enlace con respuesta no exitosa', async () => {
-        const mockResponse = { status: 404 };
-        axios.get.mockResolvedValue(mockResponse);
+    // Verificar que los enlaces estén validados correctamente
+    expect(resultado).toEqual([
+      { url: 'https://example.com', status: 200, ok: 'ok' },
+      { url: 'https://example.org', status: 200, ok: 'ok' },
+    ]);
+  });
 
-        const links = { url: 'https://www.ejemplo.com' };
-        const result = await validarLinks(links);
+  it('debería manejar errores correctamente', async () => {
+    // Datos de prueba con un enlace que generará un error
+    const links = [
+      { url: 'https://example.com' },
+      { url: 'https://invalid-url' }, // Enlace inválido
+    ];
 
-        expect(result.status).toBe(404);
-        expect(result.ok).toBe('fail');
-    });
+    // Configurar respuestas simuladas para axios.get
+    axios.get.mockRejectedValue(new Error('Network error')); // Simular un error de red
 
-    it('debería retornar estado "error" para un enlace inválido', async () => {
-        axios.get.mockRejectedValue(new Error('Error en la solicitud'));
+    const resultado = await validarLinks(links);
 
-        const links = { url: 'https://www.enlace-invalido.com' };
-        const result = await validarLinks(links);
-
-        expect(result.status).toBe('error');
-        expect(result.ok).toBe('fail');
-    });
+    // Verificar que los enlaces estén manejando los errores correctamente
+    expect(resultado).toEqual([
+      { url: 'https://example.com', status: 'error', ok: 'fail' },
+      { url: 'https://invalid-url', status: 'error', ok: 'fail' },
+    ]);
+  });
 });
 
 const mockLinks = [
-    { href: 'https://www.google.com', status: 200 },
-    { href: 'https://example.com/page2', status: 404 },
-    { href: 'https://example.com/page3', status: 200 },
-
+  { url: 'https://example.com' },
+  { url: 'https://example.org' },
+  { url: 'https://example.net' },
+  // Agrega más objetos de enlace según sea necesario
 ];
 
 describe('linkStats', () => {
-    it('debería devolver estadisticas de enlaces correctas', () => {
-      const result = linkStats (mockLinks);
+  it('debería devolver estadísticas de enlaces correctas', () => {
+    // Datos de prueba simulados (mockLinks)
+    const mockLinks = [
+      { href: 'https://example.com', status: 200 },
+      { href: 'https://example.org', status: 404 },
+      { href: 'https://example.com', status: 200 }, // Enlace duplicado
+    ];
 
-        expect(result.totalLinks).toBe(3);
-        expect(result.uniqueLinks).toBe(3);
-        expect(result.brokenLinks).toBe(1);
-        expect(result.uniqueLinksArray).toEqual([
-            'https://www.google.com',
-            'https://example.com/page2',
-            'https://example.com/page3',
-        ]);
+    const result = linkStats(mockLinks);
 
-    });
+    // Verificar las estadísticas esperadas
+    expect(result.totalLinks).toBe(3);
+    expect(result.uniqueLinks).toBe(2); // Dos enlaces únicos
+    expect(result.brokenLinks).toBe(1); // Un enlace roto
+    expect(result.uniqueLinksArray).toEqual(['https://example.com', 'https://example.org']);
+  });
 
+  it('debería manejar correctamente una lista vacía de enlaces', () => {
+    // Lista de enlaces vacía
+    const result = linkStats([]);
+
+    // Verificar que todas las estadísticas sean cero en una lista vacía
+    expect(result.totalLinks).toBe(0);
+    expect(result.uniqueLinks).toBe(0);
+    expect(result.brokenLinks).toBe(0);
+    expect(result.uniqueLinksArray).toEqual([]);
+  });
 });
-
-
-
-

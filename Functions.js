@@ -53,20 +53,28 @@ export const leerArchivo = (ruta) => {
 
 //_________________________7.- OBTENER CODIGO HTTP Y STATUS (VALIDATE)_________________________________
 //_________________________Declaramos la función validarLinks que toma un parámetro llamado "link"______________________
-export const validarLinks = (links) => {
-    return axios.get(links.url).then((response) => {
+export const validarLinks = async(links) => {
+    const validatedLinks = [];
+    await Promise.all(links.map(async (link) => {
+        try {
+            const response = await axios.get(link.url);
         if(response.status >= 200 && response.status < 400 ){
-            links.status = response.status, links.ok = "ok" 
-            return links;
+            link.status = response.status;
+            link.ok = "ok"; 
+            
         } else {
-            links.status = response.status, links.ok = "fail"
-            return links;
+            link.status = response.status;
+            link.ok = "fail"
+          
         }
-    })  .catch(error => {  
-        links.status = "error", links.ok = "fail"
-        return links;
-      });
-       
+        validatedLinks.push(link);
+    }  
+        catch(error) {  
+        link.status = "error", link.ok = "fail"
+        validatedLinks.push(link);
+        }
+      }));
+  return validatedLinks     
 }
 
 //______________________________8.-STATS (Estadisiticas de los link encontrados)_______________________________________________
@@ -79,7 +87,6 @@ export const linkStats = (links) =>  {
         totalLinks,
         uniqueLinks,
         brokenLinks,
-        uniqueLinksArray: Array.from(uniqueLinksSet),
     };
 };
 

@@ -142,7 +142,7 @@ Broken: 1
 
 Pruebas unitarias cubren el 95.74% de statements, 100% functions, 95.55% lines, y 85.5% branches.
 
-![Test](./img/27.png)
+![Test](./img/27.jpg)
 
 
 

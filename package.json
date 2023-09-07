@@ -5,6 +5,9 @@
   "author": "Carolina Cajas",
   "type": "module",
   "main": "index.js",
+  "bin": {
+    "carolinacajas-md-links": "cli.js"
+  },
   "engines": {
     "node": ">=16.x"
   },
